@@ -1,5 +1,5 @@
 ### HUAWEI TOOLS SHELL
-
+***is a tool that can be used to send sms, read sms and others on the huawei modem, thanks to the api documentation made using python in my opinion it is very complicated to run, by making it using a shell script it becomes easy and only requires bash and curl to run this code.***
 * Installation
   ```
   opkg update && opkg install wget

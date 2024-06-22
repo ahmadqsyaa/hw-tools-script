@@ -10,7 +10,11 @@
   ```
   
   ```
-  wget -O /usr/bin/ht https://raw.githubusercontent.com/ahmadqsyaa/hw-tools-script/main/ht; chmod +x /usr/bin/ht
+  wget -O /usr/bin/ht https://raw.githubusercontent.com/ahmadqsyaa/hw-tools-script/main/ht
+  ```
+  
+  ```
+  chmod +x /usr/bin/ht
   ```
 ### USAGE
 * `-r` get all sms or get sms with count `ht -r 1`

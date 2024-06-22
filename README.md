@@ -27,6 +27,9 @@
 * `-o` reboot the modem
 * `-i` network information & modem information
 * `-a` renew wan ip address
+### TESTED
+* e5577
+* e3372
 ### REPOSITORY LIST
 * [**source copas**](https://github.com/Haris131/e3372)
 * [**documentasi api**](https://github.com/Salamek/huawei-lte-api)

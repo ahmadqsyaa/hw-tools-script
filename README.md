@@ -27,3 +27,6 @@
 * [**source copas**](https://github.com/Haris131/e3372)
 * [**documentasi api**](https://github.com/Salamek/huawei-lte-api)
 * [**inspired by**](https://github.com/satriakanda/mmsms)
+### CONTACT
+* [**telegram**](https://t.me/rickk1kch)
+* [**email**](mailto:itsme@rick.biz.id)

@@ -27,6 +27,7 @@
 * `-o` reboot the modem
 * `-i` network information & modem information
 * `-a` renew wan ip address
+* `-u` update script or reinstall script
 ### TESTED
 * e5577
 * e3372

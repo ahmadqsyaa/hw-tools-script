@@ -6,8 +6,7 @@
 ipmodem="192.168.8.1"
 pass="admin"
 
-if [[ -n "$(opkg list-installed | grep -E 'libxml2|bash|curl')" ]]; then
-
+if [ ! -n "$(opkg list-installed | grep libxml2)" ]; then
 login(){
 data=$(curl -s http://$ipmodem/api/webserver/SesTokInfo -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "X-Requested-With: XMLHttpRequest" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7")
 sesi=$(echo "$data" | grep "SessionID=" | cut -b 10-147)

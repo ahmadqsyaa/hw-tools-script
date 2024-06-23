@@ -4,9 +4,9 @@
 #create https://github.com/ahmadqsyaa
 
 ipmodem="192.168.8.1"
-pass="admin"
+pass="admin123"
 
-if [ ! -n "$(opkg list-installed | grep libxml2)" ]; then
+if [ -n "$(opkg list-installed | grep libxml2)" ]; then
 login(){
 data=$(curl -s http://$ipmodem/api/webserver/SesTokInfo -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "X-Requested-With: XMLHttpRequest" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7")
 sesi=$(echo "$data" | grep "SessionID=" | cut -b 10-147)
@@ -29,30 +29,31 @@ else
   scoki=$(echo "$login"|grep [Ss]et-[Cc]ookie|cut -d':' -f2|cut -b 1-138)
   if [ ! -n "$scoki" ]; then
   echo -e "\e[31mLogin failed, please enter the IP address and password\e[0m"
-  read -r -p "enter the IP address or [Y/y] default 192.168.8.1 =>" ipads
+  read -r -p "enter the IP address or [Y/y/yes] default (192.168.8.1): " ipads
       if [[ "$ipads" =~ ^([yY][eE][sS]|[yY])$ ]]; then
        echo -e "ip default: \e[36m192.168.8.1\e[0m"
       elif [ ! -n "$ipads" ]; then
-       echo -e "\e[41m input should not be empty\e[0m"
+       echo -e "\e[1;30minput should not be empty\e[0m"
        exit 1
       else
        sed -i "6s/.*/ipmodem=\"$ipads\"/" /usr/bin/ht
-       echo -e "\e[42msuccess\e[0m"
+       echo -e "\e[1;31mip address successfully changed to\e[0m \e[1;31m$ipads\e[0m"
       fi
   read -r -p "Enter the modem password or [Y/y] default admin =>" pswd
       if [[ "$pswd" =~ ^([yY][eE][sS]|[yY])$ ]]; then
        echo -e "password default: \e[36madmin\e[0m"
       elif [ ! -n "$ipads" ]; then
-       echo -e "\e[41m input should not be empty\e[0m"
+       echo -e "\e[1;30minput should not be empty\e[0m"
        exit 1
       else
        sed -i "7s/.*/pass=\"$pswd\"/" /usr/bin/ht
-       echo -e "\e[42msuccess\e[0m"
+       echo -e "\e[1;31mpassword successfully changed to\e[0m \e[1;31m$pswd\e[0m"
       fi
   usage
   fi
 fi
 }
+
 choki(){
  data=$(curl -s http://$ipmodem/api/webserver/SesTokInfo -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "X-Requested-With: XMLHttpRequest" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $scoki")
  sesi=$(echo "$data" | grep "SessionID=" | cut -b 10-147)
@@ -65,9 +66,9 @@ function reboot() {
  res=$(curl -s -X POST http://$ipmodem/api/device/control -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "Origin: http://$ipmodem" -H "X-Requested-With: XMLHttpRequest" -H "__RequestVerificationToken: $token" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $sesi" -d '<?xml version="1.0" encoding="UTF-8"?><request><Control>1</Control></request>')
  ress=$(echo $res|awk -F "<response>" '{print $2}'|awk -F "</response>" '{print $1}')
  if [ "$ress" = "OK" ]; then
-   echo -e "\e[42mrebooting...\e[0m"
+   echo "rebooting..."
  else
-   echo -e "\e[41mfailed rebooting\e[0m"
+   echo -e "\e[1;30mfailed rebooting\e[0m"
  fi
 }
 
@@ -86,7 +87,6 @@ choki
  echo "$get" | xmllint --format -
  fi
 }
-
 
 function sendSMS(){
 login
@@ -107,12 +107,11 @@ login
  sendd=$(echo $send|awk -F "<response>" '{print $2}'|awk -F "</response>" '{print $1}')
  #echo $sendd
  if [ "$sendd" = "OK" ]; then
-   echo -e "\e[42msuccess\e[0m"
- else
-   echo -e "\e[41mfailed\e[0m"
+     echo -e "\e[1;31msuccess\e[0m"
+   else
+     echo -e "\e[1;30mfailed\e[0m"
  fi
 }
-
 
 function deletedSMS(){
 login
@@ -123,15 +122,14 @@ login
 
  dell=$(echo $del|awk -F "<response>" '{print $2}'|awk -F "</response>" '{print $1}')
     if [ "$dell" = "OK" ]; then
-      echo -e "\e[42msuccess\e[0m"
-    else
-      echo -e "\e[41mfailed\e[0m"
+      echo -e "\e[1;31msuccess\e[0m"
+   else
+      echo -e "\e[1;30mfailed\e[0m"
     fi
  else
- echo -e "\e[41mid require!\e[0m"
+ echo -e "\e[1;36mid require\e[0m"
  fi
 }
-
 
 function countSMS(){
 login
@@ -151,7 +149,6 @@ choki
  echo "=========="
 }
 
-
 function readSMS(){
 login
 choki
@@ -160,15 +157,14 @@ choki
  #echo $read
  readd=$(echo $read|awk -F "<response>" '{print $2}'|awk -F "</response>" '{print $1}')
     if [ "$readd" = "OK" ]; then
-      echo -e "\e[42msuccess\e[0m"
+      echo -e "\e[1;31msuccess\e[0m"
     else
-      echo -e "\e[41mfailed\e[0m"
+      echo -e "\e[1;30mfailed\e[0m"
     fi
  else
- echo -e "\e[41mid reuire!\e[0m"
+ echo -e "\e[1;36mid require\e[0m"
  fi
 }
-
 
 function dataSET(){
 login
@@ -178,15 +174,14 @@ choki
  #echo $set
  sett=$(echo $set|awk -F "<response>" '{print $2}'|awk -F "</response>" '{print $1}')
    if [ "$sett" = "OK" ]; then
-      echo -e "\e[42msuccess\e[0m"
+      echo -e "\e[1;31msuccess\e[0m"
    else
-      echo -e "\e[41mfailed\e[0m"
+      echo -e "\e[1;30mfailed\e[0m"
    fi
  else
- echo -e "\e[47m1 enable or 0 disable\e[0m"
+ echo -e "\e[1;36mchoose 0/1\e[0m"
  fi
 }
-
 
 function dataSTATUS(){
 login
@@ -196,12 +191,11 @@ choki
  datass=$(echo $datas|awk -F "<dataswitch>" '{print $2}'|awk -F "</dataswitch>" '{print $1}')
  #echo $datass
    if [ "$datass" == 1 ]; then
-      echo -e "\e[42mdata enable\e[0m"
+      echo -e "\e[1;31mdata ON\e[0m"
     else
-     echo -e "\e[42mdata disable\e[0m"
+     echo -e "\e[1;30mdata OFF\e[0m"
     fi
 }
-
 
 # info modem
 human_print(){
@@ -342,7 +336,6 @@ case $1 in
 esac
 }
 
-
 function info(){
  login
  choki
@@ -371,7 +364,6 @@ function info(){
  sinr=$(echo $dvi|awk -F "<sinr>" '{print $2}'|awk -F "</sinr>" '{print $1}')
 }
 
-
 function usage(){
  info
  echo "╔════════❖══════════❖════════╗"
@@ -395,6 +387,7 @@ function usage(){
  echo "| -o reboot the modem                                            | "
  echo "| -i network information & modem information                     | "
  echo "| -a renew wan ip address                                        | "
+ echo "| -u update script or reinstall script                           | "
  echo "╚════════════════════❖═══════════════════❖══════════════════════╝"
 }
 
@@ -424,16 +417,31 @@ function informasi(){
 function restart(){
  choki
  info
- echo -e "\e[41mbefore: WAN IP: $ipp\e[0m"
+ echo -e "\e[1;31mbefore WAN IP: $ipp\e[0m"
  res=$(curl -s -X GET http://$ipmodem/api/net/plmn-list -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "Origin: http://$ipmodem" -H "X-Requested-With: XMLHttpRequest" -H "__RequestVerificationToken: $token" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $sesi")
  #echo $res
  if [ -n "$res" ]; then
  sleep 5
  info
- echo -e "\e[42mafter: WAN IP: $ipp\e[0m"
+ echo -e "\e[1;31mafter WAN IP: $ipp\e[0m"
  fi
 }
 
+function update(){
+  bckip=$(sed -n '6p' /usr/bin/ht)
+  bckpw=$(sed -n '7p' /usr/bin/ht)
+  echo "backup ip address & password"
+  sleep 1
+  wget -O /usr/bin/ht-update https://raw.githubusercontent.com/ahmadqsyaa/hw-tools-script/main/ht
+  chmod +x /usr/bin/ht-update
+  sed -i "6s/.*/ipmodem=\"$bckip\"/" /usr/bin/ht-update
+  sed -i "7s/.*/pass=\"$bckpw\"/" /usr/bin/ht-update
+  echo "successfully update/reinstall"
+  sleep 1
+  rm -rf /usr/bin/ht
+  mv /usr/bin/ht-update /usr/bin/ht
+  
+}
 # end info modem
 
 case "${1}" in
@@ -472,6 +480,9 @@ case "${1}" in
     -a)
         restart
         ;;
+    -u)
+        update
+        ;;
     *)
       usage
       ;;
@@ -482,6 +493,4 @@ else
     echo "wait installing package.."
     opkg update && opkg install libxml2 libxml2-utils bash curl
     opkg list-installed | grep -E 'libxml2|bash|curl'
-    sleep 1
-    usage
 fi

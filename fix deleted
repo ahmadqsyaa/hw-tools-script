@@ -455,7 +455,7 @@ case "${1}" in
         ;;
     -d)
         shift
-        deleteSMS "${1}"
+        deletedSMS "${1}"
         ;;
     -c)
         countSMS

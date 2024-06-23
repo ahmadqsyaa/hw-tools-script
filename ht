@@ -434,8 +434,8 @@ function update(){
   sleep 1
   wget -O /usr/bin/ht-update https://raw.githubusercontent.com/ahmadqsyaa/hw-tools-script/main/ht
   chmod +x /usr/bin/ht-update
-  sed -i "6s/.*/ipmodem=\"$bckip\"/" /usr/bin/ht-update
-  sed -i "7s/.*/pass=\"$bckpw\"/" /usr/bin/ht-update
+  sed -i "6s/.*/$bckip/" /usr/bin/ht-update
+  sed -i "7s/.*/$bckpw/" /usr/bin/ht-update
   echo "successfully update/reinstall"
   sleep 1
   rm -rf /usr/bin/ht

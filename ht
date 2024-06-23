@@ -4,7 +4,7 @@
 #create https://github.com/ahmadqsyaa
 
 ipmodem="192.168.8.1"
-pass="admin123"
+pass="admin"
 
 if [ -n "$(opkg list-installed | grep libxml2)" ]; then
 login(){

@@ -22,7 +22,7 @@
 * `-d` deleted sms with id `ht -d 1000`
 * `-c` view the conten of sms inbox, outbox, unread etc
 * `-b` change the status of unread to read with id `ht -b 1`
-* `-m` change mobile data =>ht -m [0/1] 0 = OFF 1 = ON
+* `-m` change mobile data `ht -m [0/1] 0 = OFF 1 = ON`
 * `-ms` view the mobile data status
 * `-o` reboot the modem
 * `-i` network information & modem information

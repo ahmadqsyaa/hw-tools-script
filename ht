@@ -49,7 +49,6 @@ else
        sed -i "7s/.*/pass=\"$pswd\"/" /usr/bin/ht
        echo -e "\e[1;31mpassword successfully changed to\e[0m \e[1;31m$pswd\e[0m"
       fi
-  usage
   fi
 fi
 }

@@ -31,6 +31,7 @@
 ### TESTED
 * e5577
 * e3372
+* e5573
 ### REPOSITORY LIST
 * [**source copas**](https://github.com/Haris131/e3372)
 * [**documentasi api**](https://github.com/Salamek/huawei-lte-api)

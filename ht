@@ -85,10 +85,15 @@ choki
     phone=$(echo "$message" | awk -F '<Phone>' '{print $2}' | awk -F '</Phone>' '{print $1}')
     content=$(echo "$message" | awk -F '<Content>' '{print $2}' | awk -F '</Content>' '{print $1}')
     date=$(echo "$message" | awk -F '<Date>' '{print $2}' | awk -F '</Date>' '{print $1}')
-
+    
     if [ -n "$smstat" ]; then
+        if [ "$smstat" = "0" ]; then
+           status="unread"
+        else
+           status="read"
+        fi
         echo "---------------------------------------------------------"
-        echo "Smstat: $smstat"
+        echo "Status: $status"
         echo ""
     fi
     if [ -n "$index" ]; then

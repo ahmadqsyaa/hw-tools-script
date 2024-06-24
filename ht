@@ -6,7 +6,7 @@
 ipmodem="192.168.8.1"
 pass="admin"
 
-if [ -n "$(opkg list-installed | grep libxml2)" ]; then
+
 login(){
 data=$(curl -s http://$ipmodem/api/webserver/SesTokInfo -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "X-Requested-With: XMLHttpRequest" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7")
 sesi=$(echo "$data" | grep "SessionID=" | cut -b 10-147)
@@ -77,13 +77,75 @@ choki
  if [ -n "${1}" ]; then
  cn=$1
  get=$(curl -s -X POST http://$ipmodem/api/sms/sms-list -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "Origin: http://$ipmodem" -H "X-Requested-With: XMLHttpRequest" -H "__RequestVerificationToken: $token" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $sesi" -d '<?xml version="1.0" encoding="UTF-8"?><request><PageIndex>1</PageIndex><ReadCount>'"$cn"'</ReadCount><BoxType>1</BoxType><SortType>0</SortType><Ascending>0</Ascending><UnreadPreferred>true</UnreadPreferred></request>')
- format=$(echo "$get" | xmllint --format -)
- echo "$get" | xmllint --format -
+ messages=$(echo "$get" | awk -F '</Message>' '{ for(i=1; i<=NF; i++) print $i "</Message>"}')
+ 
+ while read -r message; do
+    smstat=$(echo "$message" | awk -F '<Smstat>' '{print $2}' | awk -F '</Smstat>' '{print $1}')
+    index=$(echo "$message" | awk -F '<Index>' '{print $2}' | awk -F '</Index>' '{print $1}')
+    phone=$(echo "$message" | awk -F '<Phone>' '{print $2}' | awk -F '</Phone>' '{print $1}')
+    content=$(echo "$message" | awk -F '<Content>' '{print $2}' | awk -F '</Content>' '{print $1}')
+    date=$(echo "$message" | awk -F '<Date>' '{print $2}' | awk -F '</Date>' '{print $1}')
+
+    if [ -n "$smstat" ]; then
+        echo "---------------------------------------------------------"
+        echo "Smstat: $smstat"
+        echo ""
+    fi
+    if [ -n "$index" ]; then
+        echo "Id: $index"
+        echo ""
+    fi
+    if [ -n "$phone" ]; then
+        echo "Phone: $phone"
+        echo ""
+    fi
+    if [ -n "$content" ]; then
+        echo "Message: $content"
+        echo ""
+    fi
+    if [ -n "$date" ]; then
+        echo "Date: $date"
+        echo ""
+        echo "---------------------------------------------------------"
+    fi
+done <<< "$messages"
  else
  cnn=$(curl -s -X GET http://$ipmodem/api/sms/sms-count -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "Origin: http://$ipmodem" -H "X-Requested-With: XMLHttpRequest" -H "__RequestVerificationToken: $token" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $sesi")
  cn=$(echo $cnn|awk -F "<LocalInbox>" '{print $2}'|awk -F "</LocalInbox>" '{print $1}')
  get=$(curl -s -X POST http://$ipmodem/api/sms/sms-list -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "Origin: http://$ipmodem" -H "X-Requested-With: XMLHttpRequest" -H "__RequestVerificationToken: $token" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $sesi" -d '<?xml version="1.0" encoding="UTF-8"?><request><PageIndex>1</PageIndex><ReadCount>'"$cn"'</ReadCount><BoxType>1</BoxType><SortType>0</SortType><Ascending>0</Ascending><UnreadPreferred>true</UnreadPreferred></request>')
- echo "$get" | xmllint --format -
+  
+ messages=$(echo "$get" | awk -F '</Message>' '{ for(i=1; i<=NF; i++) print $i "</Message>"}')
+ 
+ while read -r message; do
+    smstat=$(echo "$message" | awk -F '<Smstat>' '{print $2}' | awk -F '</Smstat>' '{print $1}')
+    index=$(echo "$message" | awk -F '<Index>' '{print $2}' | awk -F '</Index>' '{print $1}')
+    phone=$(echo "$message" | awk -F '<Phone>' '{print $2}' | awk -F '</Phone>' '{print $1}')
+    content=$(echo "$message" | awk -F '<Content>' '{print $2}' | awk -F '</Content>' '{print $1}')
+    date=$(echo "$message" | awk -F '<Date>' '{print $2}' | awk -F '</Date>' '{print $1}')
+
+    if [ -n "$smstat" ]; then
+        echo "---------------------------------------------------------"
+        echo "Smstat: $smstat"
+        echo ""
+    fi
+    if [ -n "$index" ]; then
+        echo "Id: $index"
+        echo ""
+    fi
+    if [ -n "$phone" ]; then
+        echo "Phone: $phone"
+        echo ""
+    fi
+    if [ -n "$content" ]; then
+        echo "Message: $content"
+        echo ""
+    fi
+    if [ -n "$date" ]; then
+        echo "Date: $date"
+        echo ""
+        echo "---------------------------------------------------------"
+    fi
+done <<< "$messages"
  fi
 }
 
@@ -486,10 +548,3 @@ case "${1}" in
       usage
       ;;
 esac
-else
-    echo "package libxml2/bash/curl is not installed."
-    sleep 1
-    echo "wait installing package.."
-    opkg update && opkg install libxml2 libxml2-utils bash curl
-    opkg list-installed | grep -E 'libxml2|bash|curl'
-fi

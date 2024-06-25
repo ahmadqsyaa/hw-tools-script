@@ -130,7 +130,7 @@ choki
  format 1
  echo "---------------------------------------------------------"
   else
-   echo "input can't be more entries should not be more than 50 "
+   echo -e "\e[31minput can't be more entries should not be more than 50\e[0m"
   fi
  else
  cnn=$(curl -s -X GET http://$ipmodem/api/sms/sms-count -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "Origin: http://$ipmodem" -H "X-Requested-With: XMLHttpRequest" -H "__RequestVerificationToken: $token" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $sesi")
@@ -179,8 +179,6 @@ login
 choki
  if [ -n "${1}" ]; then
  del=$(curl -s -X POST http://$ipmodem/api/sms/delete-sms -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "Origin: http://$ipmodem" -H "X-Requested-With: XMLHttpRequest" -H "__RequestVerificationToken: $token" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $sesi" -d '<?xml version="1.0" encoding="UTF-8"?><request><Index>'"$1"'</Index></request>')
- #echo $sendd
-
  dell=$(echo $del|awk -F "<response>" '{print $2}'|awk -F "</response>" '{print $1}')
     if [ "$dell" = "OK" ]; then
       echo -e "\e[1;32msuccess delete id\e[0m \e[31m $1\e[0m"
@@ -241,7 +239,6 @@ login
 choki
  if [ -n "${1}" ]; then
  read=$(curl -s -X POST http://$ipmodem/api/sms/set-read -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "Origin: http://$ipmodem" -H "X-Requested-With: XMLHttpRequest" -H "__RequestVerificationToken: $token" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $sesi" -d '<?xml version="1.0" encoding="UTF-8"?><request><Index>'"$1"'</Index></request>')
- #echo $read
  readd=$(echo $read|awk -F "<response>" '{print $2}'|awk -F "</response>" '{print $1}')
     if [ "$readd" = "OK" ]; then
       echo -e "\e[1;32msuccessfully changed the unread status to read with id\e[0m \e[33m$1\e[0m"
@@ -258,7 +255,6 @@ login
 choki
  if [ -n "${1}" ]; then
  set=$(curl -s -X POST http://$ipmodem/api/dialup/mobile-dataswitch -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "Origin: http://$ipmodem" -H "X-Requested-With: XMLHttpRequest" -H "__RequestVerificationToken: $token" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $sesi" -d '<?xml version="1.0" encoding="UTF-8"?><request><dataswitch>'"$1"'</dataswitch></request>')
- #echo $set
  sett=$(echo $set|awk -F "<response>" '{print $2}'|awk -F "</response>" '{print $1}')
    if [ "$sett" = "OK" ]; then
       echo -e "\e[1;32msuccess\e[0m"
@@ -544,8 +540,8 @@ function update(){
 
 case "${1}" in
     -r)
-        
-        getSMS "${1}"
+        shift
+        getSMS "${@}"
         ;;
     -s)
         shift
@@ -553,18 +549,18 @@ case "${1}" in
         ;;
     -d)
         shift
-        deletedSMS "${1}"
+        deletedSMS "${@}"
         ;;
     -c)
         countSMS
         ;;
     -b)
         shift
-        readSMS "${1}"
+        readSMS "${@}"
         ;;
     -m)
         shift
-        dataSET "${1}"
+        dataSET "${@}"
         ;;
     -ms)
         dataSTATUS

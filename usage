@@ -1,4 +1,4 @@
-|                        < USAGE >                            |
+|                    < USAGE > *ONLINE                        |
 | -r get all sms or get sms with count => ht -r 1             |
 | -s send sms with the format => ht -s [number] [message]     |
 | -d deleted all or deleted sms with id => ht -d 1000         |

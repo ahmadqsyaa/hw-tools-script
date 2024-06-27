@@ -17,17 +17,7 @@
   opkg update && opkg install wget bash curl && wget -O /usr/bin/ht https://raw.githubusercontent.com/ahmadqsyaa/hw-tools-script/main/ht && chmod +x /usr/bin/ht
   ```
 ### USAGE
-* `-r` get all sms or get sms with count `ht -r 1`
-* `-s` send sms with the format `ht -s [number] [message]`
-* `-d` deleted sms with id `ht -d 1000`
-* `-c` view the conten of sms inbox, outbox, unread etc
-* `-b` change the status of unread to read with id `ht -b 1`
-* `-m` change mobile data `ht -m [0/1] 0 = OFF 1 = ON`
-* `-ms` view the mobile data status
-* `-o` reboot the modem
-* `-i` network information & modem information
-* `-a` renew wan ip address
-* `-u` update script or reinstall script
+* <img src="https://raw.githubusercontent.com/ahmadqsyaa/hw-tools-script/main/usage.png"/>
 ### TESTED
 * e5577
 * e3372

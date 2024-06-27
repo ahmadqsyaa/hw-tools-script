@@ -4,7 +4,7 @@
 #create https://github.com/ahmadqsyaa
 
 ipmodem="192.168.8.1"
-pass="admin123"
+pass="admin"
 
 login() {
   data=$(curl -s http://$ipmodem/api/webserver/SesTokInfo -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "X-Requested-With: XMLHttpRequest" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7")
@@ -495,7 +495,7 @@ function usage() {
   echo -e "|• \e[33m-i\e[0m net info & modem info                           |"
   echo -e "|• \e[33m-a\e[0m renew wan ip address                            |"
   echo -e "|• \e[33m-u\e[0m update script or reinstall script               |"
-  echo -e "|• \e[33m-rf\e[0m \e[31m[danger zona] uninstall script \e[0m                    |"
+  echo -e "|• \e[33m-rf\e[0m \e[31m[danger zona] uninstall script \e[0m                |"
   echo -e "|\e[32mINFO\e[0m                                                 |"
   echo -e "| \e[33m[id-box]\e[0m 1 = inbox, 2 = outbox (opsional default 1) |"
   echo -e "| \e[33m[1/0]\e[0m \e[31m0 = OFF\e[0m \e[32m1 = ON\e[0m                                |"

@@ -3,7 +3,7 @@
 #do not modify this file if you do not understand it
 #create https://github.com/ahmadqsyaa
 #huawei tools script for https://github.com/ahmadqsyaa/Mod-PHPTeleBotWrt
-if test -e /root/PHPTeleBotWrt/databot; then
+if test -e /root/Mod-PHPTeleBotWrt/databot; then
 
 ipmodem=$(sed -n '4p' /root/Mod-PHPTeleBotWrt/databot)
 pass=$(sed -n '5p' /root/Mod-PHPTeleBotWrt/databot)
@@ -553,6 +553,6 @@ case "${1}" in
 esac
 
 else
-    echo "file /root/PHPTeleBotWrt/databot not found"
+    echo "file /root/Mod-PHPTeleBotWrt/databot not found"
     exit 1
 fi

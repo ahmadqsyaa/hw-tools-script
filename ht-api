@@ -2,9 +2,11 @@
 
 #do not modify this file if you do not understand it
 #create https://github.com/ahmadqsyaa
+#huawei tools script for https://github.com/ahmadqsyaa/Mod-PHPTeleBotWrt
+if test -e /root/PHPTeleBotWrt/databot; then
 
-ipmodem="192.168.8.1"
-pass="admin"
+ipmodem=$(sed -n '4p' /root/PHPTeleBotWrt/databot)
+pass=$(sed -n '5p' /root/PHPTeleBotWrt/databot)
 
 login() {
   data=$(curl -s http://$ipmodem/api/webserver/SesTokInfo -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "X-Requested-With: XMLHttpRequest" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7")
@@ -27,27 +29,8 @@ login() {
     login=$(curl -s -D- -o/dev/null -X POST http://$ipmodem/api/user/login -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "Origin: http://$ipmodem" -H "X-Requested-With: XMLHttpRequest" -H "__RequestVerificationToken: $token" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $sesi" -d '<?xml version="1.0" encoding="UTF-8"?><request><Username>admin</Username><Password>'$pass1'</request>')
     scoki=$(echo "$login" | grep [Ss]et-[Cc]ookie | cut -d':' -f2 | cut -b 1-138)
     if [ ! -n "$scoki" ]; then
-      echo -e "\e[31mLogin failed, please enter the IP address and password\e[0m"
-      read -r -p "enter the IP address or [Y/y] default (192.168.8.1): " ipads
-      if [[ "$ipads" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-        echo -e "ip default: \e[36m192.168.8.1\e[0m"
-      elif [ ! -n "$ipads" ]; then
-        echo -e "\e[1;31minput should not be empty\e[0m"
-        exit 1
-      else
-        sed -i "6s/.*/ipmodem=\"$ipads\"/" /usr/bin/ht
-        echo -e "\e[1;32mip address successfully changed to\e[0m \e[1;31m$ipads\e[0m"
-      fi
-      read -r -p "Enter the modem password or [Y/y] default admin: " pswd
-      if [[ "$pswd" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-        echo -e "password default: \e[36madmin\e[0m"
-      elif [ ! -n "$ipads" ]; then
-        echo -e "\e[1;31minput should not be empty\e[0m"
-        exit 1
-      else
-        sed -i "7s/.*/pass=\"$pswd\"/" /usr/bin/ht
-        echo -e "\e[1;32mpassword successfully changed to\e[0m \e[1;31m$pswd\e[0m"
-      fi
+      echo -e "Login failed"
+      
     fi
   fi
 }
@@ -64,22 +47,22 @@ function reboot() {
   res=$(curl -s -X POST http://$ipmodem/api/device/control -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "Origin: http://$ipmodem" -H "X-Requested-With: XMLHttpRequest" -H "__RequestVerificationToken: $token" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $sesi" -d '<?xml version="1.0" encoding="UTF-8"?><request><Control>1</Control></request>')
   ress=$(echo $res | awk -F "<response>" '{print $2}' | awk -F "</response>" '{print $1}')
   if [ "$ress" = "OK" ]; then
-    echo "\e[1;32mrebooting...\e[0m"
+    echo "rebooting..."
   else
-    echo -e "\e[1;31mfailed rebooting\e[0m"
+    echo -e "failed rebooting"
   fi
 }
 # function for get sms
 function format() {
   if [ ! -n "$countsms" ]; then
-    echo -e "\e[1;31mfailed to read SMS or SMS 0\e[0m"
+    echo "failed to read SMS or SMS 0"
   else
     if [ "$1" = "1" ]; then
-      echo -e "Read in \e[1;31m$countsms\e[0m SMS"
+      echo -e "Read in $countsms SMS"
     elif [ "$1" = "2" ]; then
-      echo -e "Found \e[1;31m$countsms\e[0m SMS Inbox"
+      echo -e "Found $countsms SMS Inbox"
     else
-      echo -e "Found \e[1;31m$countsms\e[0m SMS Outbox"
+      echo -e "Found $countsms SMS Outbox"
     fi
     while read -r message; do
       smstat=$(echo "$message" | awk -F '<Smstat>' '{print $2}' | awk -F '</Smstat>' '{print $1}')
@@ -90,11 +73,11 @@ function format() {
 
       if [ -n "$smstat" ]; then
         if [ "$smstat" = "0" ]; then
-          status="\e[1;31munread\e[0m"
+          status="unread"
         else
-          status="\e[1;32mread\e[0m"
+          status="read"
         fi
-        echo "---------------------------------------------------------"
+        echo "-----------------------------"
         echo -e "Status: $status"
         echo ""
       fi
@@ -113,7 +96,7 @@ function format() {
       if [ -n "$date" ]; then
         echo "Date: $date"
         echo ""
-        echo "---------------------------------------------------------"
+        echo "-----------------------------"
       fi
     done <<<"$messages"
   fi
@@ -134,11 +117,11 @@ function getSMS() {
       get=$(curl -s -X POST http://$ipmodem/api/sms/sms-list -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "Origin: http://$ipmodem" -H "X-Requested-With: XMLHttpRequest" -H "__RequestVerificationToken: $token" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $sesi" -d '<?xml version="1.0" encoding="UTF-8"?><request><PageIndex>1</PageIndex><ReadCount>'"$cn"'</ReadCount><BoxType>'"$bk"'</BoxType><SortType>0</SortType><Ascending>0</Ascending><UnreadPreferred>true</UnreadPreferred></request>')
       messages=$(echo "$get" | awk -F '</Message>' '{ for(i=1; i<=NF; i++) print $i "</Message>"}')
       countsms=$(echo $get | awk -F "<Count>" '{print $2}' | awk -F "</Count>" '{print $1}')
-      echo "---------------------------------------------------------"
+      echo "-----------------------------"
       format 1
-      echo "---------------------------------------------------------"
+      echo "-----------------------------"
     else
-      echo -e "\e[31minput can't be more entries should not be more than 50\e[0m"
+      echo -e "input can't be more entries should not be more than 50"
     fi
   elif [ "$1" = "outbox" ]; then
     login
@@ -146,9 +129,9 @@ function getSMS() {
     get=$(curl -s -X POST http://$ipmodem/api/sms/sms-list -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "Origin: http://$ipmodem" -H "X-Requested-With: XMLHttpRequest" -H "__RequestVerificationToken: $token" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $sesi" -d '<?xml version="1.0" encoding="UTF-8"?><request><PageIndex>1</PageIndex><ReadCount>50</ReadCount><BoxType>2</BoxType><SortType>0</SortType><Ascending>0</Ascending><UnreadPreferred>true</UnreadPreferred></request>')
     messages=$(echo "$get" | awk -F '</Message>' '{ for(i=1; i<=NF; i++) print $i "</Message>"}')
     countsms=$(echo $get | awk -F "<Count>" '{print $2}' | awk -F "</Count>" '{print $1}')
-    echo "---------------------------------------------------------"
+    echo "-----------------------------"
     format 3
-    echo "---------------------------------------------------------"
+    echo "-----------------------------"
   else
     cnn=$(curl -s -X GET http://$ipmodem/api/sms/sms-count -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "Origin: http://$ipmodem" -H "X-Requested-With: XMLHttpRequest" -H "__RequestVerificationToken: $token" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $sesi")
     cn1=$(echo $cnn | awk -F "<LocalInbox>" '{print $2}' | awk -F "</LocalInbox>" '{print $1}')
@@ -160,9 +143,9 @@ function getSMS() {
     get=$(curl -s -X POST http://$ipmodem/api/sms/sms-list -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "Origin: http://$ipmodem" -H "X-Requested-With: XMLHttpRequest" -H "__RequestVerificationToken: $token" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $sesi" -d '<?xml version="1.0" encoding="UTF-8"?><request><PageIndex>1</PageIndex><ReadCount>'"$cn"'</ReadCount><BoxType>1</BoxType><SortType>0</SortType><Ascending>0</Ascending><UnreadPreferred>true</UnreadPreferred></request>')
     messages=$(echo "$get" | awk -F '</Message>' '{ for(i=1; i<=NF; i++) print $i "</Message>"}')
     countsms=$(echo $get | awk -F "<Count>" '{print $2}' | awk -F "</Count>" '{print $1}')
-    echo "---------------------------------------------------------"
+    echo "-----------------------------"
     format 2
-    echo "---------------------------------------------------------"
+    echo "-----------------------------"
   fi
 }
 
@@ -170,12 +153,12 @@ function sendSMS() {
   login
   to="${1}"
   if [[ ! "$to" =~ ^\+?[0-9]+$ ]]; then
-    echo -e "\e[31mPlease provide the receiver number (08xxxx or +628xxx)\e[0m"
+    echo -e "Please provide the receiver number (08xxxx or +628xxx)"
     exit 1
   fi
   message="${@:2}"
   if [ -z "$message" ]; then
-    echo -e "\e[31mPlease provide the message\e[0m"
+    echo -e "Please provide the message"
     exit 1
   fi
   choki
@@ -185,9 +168,9 @@ function sendSMS() {
   sendd=$(echo $send | awk -F "<response>" '{print $2}' | awk -F "</response>" '{print $1}')
   #echo $sendd
   if [ "$sendd" = "OK" ]; then
-    echo -e "\e[1;32msuccess\e[0m Send SMS to \e[32m$to\e[0m message \e[33m$message\e[0m"
+    echo -e "success Send SMS to $to message $message"
   else
-    echo -e "\e[1;31mfailed send SMS\e[0m"
+    echo -e "failed send SMS"
   fi
 }
 
@@ -198,18 +181,15 @@ function deletedSMS() {
     del=$(curl -s -X POST http://$ipmodem/api/sms/delete-sms -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "Origin: http://$ipmodem" -H "X-Requested-With: XMLHttpRequest" -H "__RequestVerificationToken: $token" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $sesi" -d '<?xml version="1.0" encoding="UTF-8"?><request><Index>'"$1"'</Index></request>')
     dell=$(echo $del | awk -F "<response>" '{print $2}' | awk -F "</response>" '{print $1}')
     if [ "$dell" = "OK" ]; then
-      echo -e "\e[1;32msuccess delete id\e[0m \e[31m $1\e[0m"
+      echo -e "success delete id  $1"
     else
-      echo -e "\e[1;31mfailed, id not found\e[0m"
+      echo -e "failed, id not found"
     fi
   else
-    #echo -e "\e[1;36mid require\e[0m"
-    read -r -p "ꐦ are you sure you want to delete all sms (maximum deleted sms 50) enter [Y/y] if you agree: " aggre
-    if [[ "$aggre" =~ ^([yY][eE][sS]|[yY])$ ]]; then
       get=$(curl -s -X POST http://$ipmodem/api/sms/sms-list -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "Origin: http://$ipmodem" -H "X-Requested-With: XMLHttpRequest" -H "__RequestVerificationToken: $token" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $sesi" -d '<?xml version="1.0" encoding="UTF-8"?><request><PageIndex>1</PageIndex><ReadCount>50</ReadCount><BoxType>1</BoxType><SortType>0</SortType><Ascending>0</Ascending><UnreadPreferred>true</UnreadPreferred></request>')
       cn=$(echo $get | awk -F "<Count>" '{print $2}' | awk -F "</Count>" '{print $1}')
       if [ "$cn" == 0 ]; then
-        echo -e "\e[1;31mfailed to deleted all SMS or SMS 0\e[0m"
+        echo -e "failed to deleted all SMS or SMS 0"
       else
         messages=$(echo "$get" | awk -F '</Message>' '{ for(i=1; i<=NF; i++) print $i "</Message>"}')
         login
@@ -220,18 +200,14 @@ function deletedSMS() {
             dellal=$(curl -s -X POST http://$ipmodem/api/sms/delete-sms -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "Origin: http://$ipmodem" -H "X-Requested-With: XMLHttpRequest" -H "__RequestVerificationToken: $token" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $sesi" -d '<?xml version="1.0" encoding="UTF-8"?><request><Index>'"$index"'</Index></request>')
             dells=$(echo $dellal | awk -F "<response>" '{print $2}' | awk -F "</response>" '{print $1}')
             if [ ! "$dells" = "" ]; then
-              echo -e "\e[1;31mfailed\e[0m"
+              echo -e "failed"
             fi
           fi
         done <<<"$messages"
         if [ ! -n "$index" ]; then
-          echo -e "\e[1;32msuccessfully deleted all sms\e[0m"
+          echo -e "successfully deleted all sms"
         fi
       fi
-    else
-      echo -e "\e[1;31minput invalid, cancell\e[0m"
-      exit 1
-    fi
   fi
 }
 
@@ -245,11 +221,11 @@ function countSMS() {
   draf=$(echo $count | awk -F "<LocalDraft>" '{print $2}' | awk -F "</LocalDraft>" '{print $1}')
   deleted=$(echo $count | awk -F "<LocalDeleted>" '{print $2}' | awk -F "</LocalDeleted>" '{print $1}')
   echo "--------------------"
-  echo -e "- unread \e[1;31m$unread\e[0m sms"
-  echo -e "- inbox \e[1;31m$inbox\e[0m sms"
-  echo -e "- outbox \e[1;31m$outbox\e[0m sms"
-  echo -e "- draf \e[1;31m$draf\e[0m sms"
-  echo -e "- deleted \e[1;31m$deleted\e[0m sms"
+  echo -e "- unread $unread sms"
+  echo -e "- inbox $inbox sms"
+  echo -e "- outbox $outbox sms"
+  echo -e "- draf $draf sms"
+  echo -e "- deleted $deleted sms"
   echo "--------------------"
 }
 
@@ -260,12 +236,12 @@ function readSMS() {
     read=$(curl -s -X POST http://$ipmodem/api/sms/set-read -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "Origin: http://$ipmodem" -H "X-Requested-With: XMLHttpRequest" -H "__RequestVerificationToken: $token" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $sesi" -d '<?xml version="1.0" encoding="UTF-8"?><request><Index>'"$1"'</Index></request>')
     readd=$(echo $read | awk -F "<response>" '{print $2}' | awk -F "</response>" '{print $1}')
     if [ "$readd" = "OK" ]; then
-      echo -e "\e[1;32msuccessfully changed the unread status to read with id\e[0m \e[33m$1\e[0m"
+      echo -e "successfully changed the unread status to read with id \e[33m$1"
     else
-      echo -e "\e[1;31mfailed, id not found\e[0m"
+      echo -e "failed, id not found"
     fi
   else
-    echo -e "\e[1;36mid require\e[0m"
+    echo -e "id require"
   fi
 }
 
@@ -276,13 +252,14 @@ function dataSET() {
     set=$(curl -s -X POST http://$ipmodem/api/dialup/mobile-dataswitch -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "Origin: http://$ipmodem" -H "X-Requested-With: XMLHttpRequest" -H "__RequestVerificationToken: $token" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $sesi" -d '<?xml version="1.0" encoding="UTF-8"?><request><dataswitch>'"$1"'</dataswitch></request>')
     sett=$(echo $set | awk -F "<response>" '{print $2}' | awk -F "</response>" '{print $1}')
     if [ "$sett" = "OK" ]; then
-      echo -e "\e[1;32msuccess\e[0m"
-      dataSTATUS
+      echo -e "success"
+      sleep 2
+      curl -s -X POST http://$ipmodem/api/dialup/mobile-dataswitch -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "Origin: http://$ipmodem" -H "X-Requested-With: XMLHttpRequest" -H "__RequestVerificationToken: $token" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $sesi" -d '<?xml version="1.0" encoding="UTF-8"?><request><dataswitch>1</dataswitch></request>'
     else
-      echo -e "\e[1;31mfailed, select 1 and 0\e[0m"
+      echo -e "failed, select 1 and 0"
     fi
   else
-    echo -e "\e[1;36mchoose 0/1\e[0m"
+    echo -e "choose 0/1"
   fi
 }
 
@@ -294,9 +271,9 @@ function dataSTATUS() {
   datass=$(echo $datas | awk -F "<dataswitch>" '{print $2}' | awk -F "</dataswitch>" '{print $1}')
   #echo $datass
   if [ "$datass" == 1 ]; then
-    echo -e "\e[1;32mDATA ON\e[0m"
+    echo -e "DATA ON"
   else
-    echo -e "\e[1;31mDATA OFF\e[0m"
+    echo -e "DATA OFF"
   fi
 }
 
@@ -467,41 +444,6 @@ function info() {
   sinr=$(echo $dvi | awk -F "<sinr>" '{print $2}' | awk -F "</sinr>" '{print $1}')
 }
 
-function usage() {
-  info
-  echo "╔════════❖══════════❖════════╗"
-  echo -e "|   \e[35mHuawei Tools Script v2\e[0m    |"
-  echo "|  Created by Rick Qsyaerick  |"
-  echo "╚════════❖═════|════❖════════╝"
-  echo "╔════════❖═════|════❖════════╗"
-  echo -e "➥ 𝙾𝚙𝚎𝚛𝚊𝚝𝚘𝚛 : \e[1;34m$operator\e[0m"
-  echo -e "➥ 𝙳𝚎𝚟𝚒𝚌𝚎 : \e[1;34m$tp\e[0m"
-  echo -e "➥ 𝚆𝚊𝚗 𝙸𝙿 : \e[32m$ipp\e[0m"
-  echo "╚════════❖═════|════❖════════╝"
-  echo "-------------------------------------------------------"
-  echo "|                      < USAGE >                      |"
-  echo "-------------------------------------------------------"
-  echo -e "|• \e[33m-r\e[0m get all sms inbox (default)                     |"
-  echo -e "|• \e[33m-r outbox\e[0m get all sms outbox                       |"
-  echo -e "|• \e[33m-r [1-50] [id-box]\e[0m get sms with count              |"
-  echo -e "|• \e[33m-s [nophone] [message]\e[0m send sms                    |"
-  echo -e "|• \e[33m-d\e[0m \e[31mdeleted all sms\e[0m                                 |"
-  echo -e "|• \e[33m-d [id sms]\e[0m deleted sms with id                    |"
-  echo -e "|• \e[33m-c\e[0m get the sms count on each box                   |"
-  echo -e "|• \e[33m-b [id sms]\e[0m set the sms status to read             |"
-  echo -e "|• \e[33m-m [1/0]\e[0m change mobile data                        |"
-  echo -e "|• \e[33m-ms\e[0m view the mobile data status                    |"
-  echo -e "|• \e[33m-o\e[0m reboot the modem                                |"
-  echo -e "|• \e[33m-i\e[0m net info & modem info                           |"
-  echo -e "|• \e[33m-a\e[0m renew wan ip address                            |"
-  echo -e "|• \e[33m-u\e[0m update script or reinstall script               |"
-  echo -e "|• \e[33m-rf\e[0m \e[31m[danger zona] uninstall script \e[0m                |"
-  echo -e "|\e[32mINFO\e[0m                                                 |"
-  echo -e "| \e[33m[id-box]\e[0m 1 = inbox, 2 = outbox (opsional default 1) |"
-  echo -e "| \e[33m[1/0]\e[0m \e[31m0 = OFF\e[0m \e[32m1 = ON\e[0m                                |"
-  echo -e "-------------------------------------------------------"
-}
-
 function informasi() {
   info
   echo "╔════════❖══════════❖════════╗"
@@ -535,8 +477,8 @@ function restart() {
   start_time=$(date +%s)
   choki
   info
-  echo -e "\e[1;32mbefore WAN IP: $ipp\e[0m"
-  echo -e "\e[1;33mplease wait ...\e[0m"
+  echo -e "before WAN IP: $ipp"
+  echo -e "please wait ..."
   res=$(curl -s -X GET http://$ipmodem/api/net/plmn-list -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "Origin: http://$ipmodem" -H "X-Requested-With: XMLHttpRequest" -H "__RequestVerificationToken: $token" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $sesi")
   #echo $res
   if [ -n "$res" ]; then
@@ -545,41 +487,25 @@ function restart() {
     info
     end_time=$(date +%s)
     duration=$((end_time - start_time))
-    echo -e "\e[1;32mafter WAN IP: $ipp\e[0m"
-    echo -e "\e[1;36mcompleted in time $duration s\e[0m"
+    echo -e "after WAN IP: $ipp"
+    echo -e "completed in time $duration s"
   fi
 }
 
 function update() {
-  bckip=$(sed -n '6p' /usr/bin/ht)
-  bckpw=$(sed -n '7p' /usr/bin/ht)
-  echo "backup ip address & password"
-  wget -q -O /usr/bin/ht-update https://raw.githubusercontent.com/ahmadqsyaa/hw-tools-script/main/ht
+  wget -q -O /usr/bin/ht-update https://raw.githubusercontent.com/ahmadqsyaa/hw-tools-script/ht-api/ht-api
   if [ $? -ne 0 ]; then
-    echo -e "\e[1;31mUpdate/reinstall failed please try again and make sure your internet is good\e[0m"
+    echo -e "Update/reinstall failed please try again and make sure your internet is good"
     exit 1
   else
     chmod +x /usr/bin/ht-update
-    sed -i "6s/.*/$bckip/" /usr/bin/ht-update
-    sed -i "7s/.*/$bckpw/" /usr/bin/ht-update
-    echo -e "\e[1;36msuccessfully update/reinstall\e[0m"
+    echo -e "successfully update/reinstall"
     sleep 1
-    rm -rf /usr/bin/ht
-    mv /usr/bin/ht-update /usr/bin/ht
+    rm -rf /usr/bin/ht-api
+    mv /usr/bin/ht-update /usr/bin/ht-api
   fi
 }
 
-function uninstall() {
-  read -r -p "Are you sure you want to uninstall? [Y/y] or [N/n]: " yn
-  if [[ "$yn" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-    echo "thanks for using huawei tools script :)"
-    sleep 1
-    rm -rf /usr/bin/ht
-  else
-    echo "uninstall canceled"
-    exit
-  fi
-}
 # end info modem
 
 case "${1}" in
@@ -621,10 +547,12 @@ case "${1}" in
 -u)
   update
   ;;
--rf)
-  uninstall
-  ;;
 *)
-  usage
+  exit
   ;;
 esac
+
+else
+    echo "file /root/PHPTeleBotWrt/databot not found"
+    exit 1
+fi

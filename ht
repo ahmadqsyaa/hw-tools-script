@@ -14,7 +14,7 @@ login() {
   state=$(echo $check | awk -F "<State>" '{print $2}' | awk -F "</State>" '{print $1}')
   type=$(echo $check | awk -F "<password_type>" '{print $2}' | awk -F "</password_type>" '{print $1}')
   if [ $state = "0" ]; then
-    echo "Activated Successfully"
+    ok=true
   else
     if [ $type = "4" ]; then
       pass1=$(echo -n "$pass" | sha256sum | head -c 64 | base64 -w 0)
@@ -268,6 +268,39 @@ function readSMS() {
     fi
   else
     echo -e "\e[1;36mid require\e[0m"
+  fi
+}
+#test
+bandsett() {
+  local freq="$1"
+  case "$freq" in
+    "2100") echo 1 ;;
+    "1900") echo 2 ;;
+    "1800") echo 4 ;;
+    "2300") echo 8000000000 ;;
+    "2600") echo 2000000000 ;;
+    "850") echo 2000000 ;;
+    "900") echo 80 ;;
+    "auto") echo 7FFFFFFFFFFFFFFF ;;
+  esac
+}
+
+function bandSET() {
+  login
+  choki
+  if [ -n "${1}" ]; then
+  netband=$(bandsett "$1")
+    setb=$(curl -s -X POST http://$ipmodem/api/net/net-mode -H "Host: $ipmodem" -H "Connection: keep-alive" -H "Accept: */*" -H "Origin: http://$ipmodem" -H "X-Requested-With: XMLHttpRequest" -H "__RequestVerificationToken: $token" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: http://$ipmodem/html/home.html" -H "Accept-Encoding: gzib, deflate" -H "Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7" -H "Cookie: $sesi" -d '<?xml version="1.0" encoding="UTF-8"?><request><NetworkMode>00</NetworkMode><NetworkBand>3FFFFFFF</NetworkBand><LTEBand>'"$netband"'</LTEBand></request>')
+    settb=$(echo $setb | awk -F "<response>" '{print $2}' | awk -F "</response>" '{print $1}')
+    if [ "$settb" = "OK" ]; then
+      echo -e "\e[1;32msuccess\e[0m"
+    else
+      echo -e "\e[1;31mfailed\e[0m"
+    fi
+  else
+    echo -e "\e[1;36mchoose band \e[0m"
+    echo -e "\e[1;33mauto|850|900|1800|1900|2100|2300|2600\e[0m"
+    echo -e "\e[1;36mexample: ht -bs 1800\e[0m"
   fi
 }
 
@@ -603,6 +636,10 @@ case "${1}" in
 -b)
   shift
   readSMS "${@}"
+  ;;
+-bs)
+  shift
+  bandSET "${@}"
   ;;
 -m)
   shift

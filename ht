@@ -525,7 +525,7 @@ function usage() {
   echo -e "|• \e[33m-c\e[0m get the sms count on each box                   |"
   echo -e "|• \e[33m-b [id sms]\e[0m set the sms status to read             |"
   echo -e "|• \e[33m-m [1/0]\e[0m change mobile data                        |"
-  echo -e "|• \e[33m-m auto|900|1800|2100 ..\e[0m change band 4g            |"
+  echo -e "|• \e[33m-bs auto|900|1800|2100 ..\e[0m change band 4g            |"
   echo -e "|• \e[33m-ms\e[0m view the mobile data status                    |"
   echo -e "|• \e[33m-o\e[0m reboot the modem                                |"
   echo -e "|• \e[33m-i\e[0m net info & modem info                           |"
